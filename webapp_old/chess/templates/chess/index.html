@@ -1,0 +1,245 @@
+{% extends "base_generic.html" %}
+
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'chess/css/chessboard-0.3.0.min.css' %}" />
+<style type="text/css">
+
+/* center text in progress bar */
+.progress {
+    position: relative;
+}
+
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+}
+
+/* supress bootstrap progress bar transitions */
+.progress-bar {
+    -webkit-transition: none !important;
+    transition: none !important;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h1>Chess</h1>
+        <p><b>wikipedia:</b> Chess is believed to have originated in India sometime before the 7th century, being derived from the Indian game chaturanga, which is also the likely ancestor of the Eastern strategy games xiangqi, janggi, and shogi. (A minority view holds that chess originated in China.) The pieces assumed their current powers in Spain in the late 15th century; the rules were finally standardized in the 19th century.</p>
+        <hr>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div id="board" ></div>
+    </div>
+    <div class="col-sm-6">
+        <div class="well bs-component">
+            <form class="form-horizontal" id="control-form">
+                <fieldset>
+                    <legend>Input analysis</legend>
+                    <p>Type the id of an existing or a new user and press the 'record user' button to begin.</p>
+                    <div class="form-group" id="form-group-inputUser">
+                        <label for="inputUser" class="col-lg-4 control-label">User:</label>
+                        <div class="col-lg-4">
+                            <input class="form-control" id="inputUser" placeholder="username" type="text">
+                        </div>
+                        <div class="col-lg-4">
+                            <button type="submit" id="record-user-btn" class="btn btn-primary">Record user</button>
+                            <button type="submit" id="stop-record-btn" class="btn btn-primary" style="display: none">Stop recording</button>
+                        </div>
+                    </div>
+                    <div class="form-group" id="form-group-minvalue">
+                        <label for="inputMin" class="col-lg-4 control-label">Minimum value:</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" id="inputMin" value="0.0" placeholder="0.0" type="text">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <div class="progress" style="display:none" id="progress-bar-container">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;" id="progress-bar">
+                    <span class="show">Recording user <span id="user-recording-alert-iduser"></span> input</span>
+                </div>
+            </div>
+            <p>This <strong>Confusion Matrix</strong> shows the similarity of every user with respect to every other user as computed by the neural network:</p>
+            <img class="img-responsive" src="/neuralauth/compare?rangemin=0.0" id="graph-confusion-matrix">
+            <br/>
+            <p>Press this button to reset the data collected by the network</p>
+            <button type="submit" id="btn-reset-state" class="btn btn-primary">Reset state</button>
+            <button type="submit" id="btn-reload-graph" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;refresh graph</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'neuralauth/neuralauth.js' %}"></script>
+<script type="text/javascript">
+
+// reload the confusion matrix on every sent batch
+neuralauth.setOnRecognizeCb(function() {
+    if(validate()) {
+        d = new Date();
+        min = parseFloat($("#inputMin").val());
+        $("#graph-confusion-matrix").attr("src", "/neuralauth/compare?rangemin="+min+"&touch="+d.getTime());
+    }
+});
+
+// update the progress bar when input is recorded
+neuralauth.setInputRecordCb(function(size) {
+    var pct = (size / neuralauth.EVENT_BUFFER_SIZE) * 100;
+    setTimeout(function() {
+        $('#progress-bar').css('width', pct + '%');
+    });
+});
+
+/* Validate the form */
+function validate() {
+
+    var valid = true;
+
+    if($('#inputUser').val() == "") {
+        $('#form-group-inputUser').addClass('has-error');        
+        valid = false;
+    } else {
+        $('#form-group-inputUser').removeClass('has-error');
+    }
+
+    var inputMin = $('#inputMin').val();
+    if(parseFloat(inputMin) == NaN || parseFloat(inputMin) < 0.0  || parseFloat(inputMin) > 10.0) {
+        $('#form-group-minvalue').addClass('has-error');
+        valid = false;
+    } else {
+        $('#form-group-minvalue').removeClass('has-error');
+    }
+
+    return valid;
+}
+
+// prevent form from submitting
+$("#control-form").submit(function(e) {
+    e.preventDefault();
+});
+
+$('#record-user-btn').click(function() {
+    if(validate()) {
+        $('#progress-bar-container').show();
+        $('#record-user-btn').hide()
+        $('#stop-record-btn').show();
+
+        neuralauth.start($('#inputUser').val())
+    }
+});
+
+$('#stop-record-btn').click(function() {
+    $('#progress-bar-container').hide();
+    $('#stop-record-btn').hide();
+    $("#record-user-btn").show();
+    $("#user-recording-alert").hide();
+    $('#progress-bar').css('width', 0 + '%');
+    neuralauth.stop();
+});
+
+$('#btn-reset-state').click(function() {
+    if(validate()) {
+        neuralauth.reset();
+        d = new Date();
+        min = parseFloat($("#inputMin").val());
+        $("#graph-confusion-matrix").attr("src", "/neuralauth/compare?rangemin="+min+"&touch="+d.getTime());
+    }
+});
+
+$('#btn-reload-graph').click(function() {
+
+    var valid = true;
+    var inputMin = $('#inputMin').val();
+    if(parseFloat(inputMin) == NaN || parseFloat(inputMin) < 0.0  || parseFloat(inputMin) > 10.0) {
+        $('#form-group-minvalue').addClass('has-error');
+        valid = false;
+    } else {
+        $('#form-group-minvalue').removeClass('has-error');
+    }
+
+
+    if(valid) {
+        d = new Date();
+        min = parseFloat($("#inputMin").val());
+        $("#graph-confusion-matrix").attr("src", "/neuralauth/compare?rangemin="+min+"&touch="+d.getTime());   
+    }
+});
+
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js"></script>
+<script src="{% static 'chess/js/chessboard-0.3.0.min.js' %}"></script>
+<script type="text/javascript">
+
+// Adjust board size 
+//wwidth = $(window).width()
+//wheight = $(window).height() - 200;
+//$('#board').width(wheight);
+
+var board,
+    game = new Chess();
+
+// do not pick up pieces if the game is over
+// only pick up pieces for White
+var onDragStart = function(source, piece, position, orientation) {
+    if (game.in_checkmate() === true || game.in_draw() === true ||
+            piece.search(/^b/) !== -1) {
+        return false;
+    }
+};
+
+var makeRandomMove = function() {
+    var possibleMoves = game.moves();
+
+    // game over
+    if (possibleMoves.length === 0) return;
+
+    var randomIndex = Math.floor(Math.random() * possibleMoves.length);
+    game.move(possibleMoves[randomIndex]);
+    board.position(game.fen());
+};
+
+var onDrop = function(source, target) {
+    // see if the move is legal
+    var move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // NOTE: always promote to a queen for example simplicity
+    });
+
+    // illegal move
+    if (move === null) return 'snapback';
+
+    // make random legal move for black
+    window.setTimeout(makeRandomMove, 250);
+};
+
+// update the board position after the piece snap
+// for castling, en passant, pawn promotion
+var onSnapEnd = function() {
+    board.position(game.fen());
+};
+
+var cfg = {
+    draggable: true,
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
+};
+board = ChessBoard('board', cfg);
+
+
+</script>
+{% endblock %}

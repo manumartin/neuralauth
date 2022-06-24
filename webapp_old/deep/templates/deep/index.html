@@ -1,0 +1,359 @@
+{% extends "base_generic.html" %}
+
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'deep/css/game.css' %}">
+<style type="text/css">
+
+/* center text in progress bar */
+.progress {
+    position: relative;
+}
+
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+}
+
+/* supress bootstrap progress bar transitions */
+.progress-bar {
+    -webkit-transition: none !important;
+    transition: none !important;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h1>Command &amp; Conquer</h1>
+        <p><b>wikipedia:</b> Command &amp; Conquer, sometimes known as Command &amp; Conquer: Tiberian Dawn, is a 1995 real-time strategy video game developed by Westwood Studios and published by Virgin Interactive. Set in an alternate history of modern day, the game tells the story of a world war between two globalized factions: the Global Defense Initiative of the United Nations and a cult-like militant organization called the Brotherhood of Nod, led by the mysterious Kane. The groups compete for control of Tiberium, a mysterious substance that slowly spreads across the world.</p>
+        <p><span style="color:red">Warning!</span> Only the GDI missions are avaiblable for now, (select the yellow sign when starting)</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+
+<div class="mainlayoutdiv">
+	<div class="middlepanel" style="width: 643px;">
+		<div class="fullscreencontainer">
+			<div class="gamecontainer" style="width: 643px; height: 537px;">
+				<div id="gameinterfacescreen" class="gamelayer" style="width: 643px; height: 537px;">
+					<canvas class="gamebackgroundcanvas" height="535" width="640"></canvas>
+					<canvas class="gameforegroundcanvas" height="535" width="640">Your browser does not support the HTML5 Canvas feature. This game uses new HTML5 features and will only work on the latest versions of Firefox, Safari or Chrome (and maybe Internet Explorer 9).</canvas>
+					<canvas class="gameutilitycanvas" height="535" width="640"></canvas>
+					<canvas class="videocanvas" height="535" width="640"></canvas>
+
+					<div class=" messages"></div>
+
+					<canvas class="mousecanvas" height="535" width="640"></canvas>
+					<input class=" input-message" type="text">
+
+				</div>
+				<div id="menu-container" class="gamelayer" style="width: 643px; height: 537px; background: transparent none repeat scroll 0% 0%; display: block;">
+					<div id="game-type-menu-div" class="game-menu" style="top: 121px; left: 168px; display: block;">
+						<p class="header">C&amp;C-HTML5 - v0.8.3.b <br>by <a href="http://www.adityaravishankar.com/" target="_blank">Aditya Ravi Shankar</a></p>
+						<input class="singleplayer-game" type="button">
+						<input class="load-game" type="button">
+						<input class="multiplayer-game" type="button">
+						<input class="view-game-replay" type="button">
+					</div>
+					<div id="mission-ended-menu-div" class="game-menu" style="top: 269px; left: 322px; display: none;">
+					</div>
+					<div id="select-campaign-menu-div" class="game-menu select-transmission" style="width: 643px; height: 537px; top: 0px; left: 0px; display: none;">
+						<input class="gdi-campaign" value=" " referrerPolicy="no-referrer" src="images/blank.gif" type="image">
+						<input class="nod-campaign" value=" " referrerPolicy="no-referrer" src="images/blank.gif" type="image">
+						<img class="select-transmission-text" referrerPolicy="no-referrer" src="images/menu/select-transmission.png">
+					</div>
+					<div id="load-mission-menu-div" class="game-menu" style="top: 113px; left: 72px; display: none;">
+						<select class="mission-list" size="11" multiple="false">
+						</select>
+						<input class="load-button" type="button">
+						<input class="cancel-button" type="button">
+					</div>
+					<div id="save-mission-menu-div" class="game-menu" style="top: 113px; left: 72px; display: none;">
+						<select class="mission-list" size="11" multiple="false">
+						</select>
+						<input class="mission-name" type="text">
+						<input class="save-button" type="button">
+						<input class="cancel-button" type="button">
+					</div>
+					<div id="delete-mission-menu-div" class="game-menu" style="top: 113px; left: 72px; display: none;">
+						<select class="mission-list" size="11" multiple="false">
+						</select>
+						<input class="delete-button" type="button">
+						<input class="cancel-button" type="button">
+					</div>
+					<div id="replay-game-menu-div" class="game-menu" style="top: 113px; left: 72px; display: none;">
+						<select class="mission-list" size="11" multiple="false">
+						</select>
+						<input class="save-button" type="button">
+						<input class="load-button" type="button">
+						<input class="cancel-button" type="button">
+					</div>
+					<div id="singleplayer-game-options-menu-div" class="game-menu" style="top: 169px; left: 98px; display: none;">
+						<input class="load-mission-button" type="button">
+						<input class="save-mission-button" type="button">
+						<input class="delete-mission-button" type="button">
+						<input class="game-controls-button" type="button">
+						<input class="abort-mission-button" type="button">
+						<input class="resume-mission-button" type="button">
+						<input class="restate-mission-button" type="button">
+					</div>
+					<div id="multiplayer-game-options-menu-div" class="game-menu" style="top: 169px; left: 98px; display: none;">
+						<input class="sound-controls-button" type="button">
+						<input class="resume-game-button" type="button">
+						<input class="abort-game-button" type="button">
+					</div>
+					<div id="abort-mission-menu-div" class="game-menu" style="top: 202px; left: 173px; display: none;">
+						<input class="yes-button" type="button">
+						<input class="restart-button" type="button">
+						<input class="no-button" type="button">
+					</div>
+					<div id="restate-mission-menu-div" class="game-menu" style="top: 181px; left: 32px; display: none;">
+						<input class="video-button" type="button">
+						<input class="options-button" type="button">
+						<div class="mission-briefing">??</div>
+					</div>
+					<div id="game-controls-menu-div" class="game-menu" style="top: 128px; left: 90px; display: none;">
+						<div class="gamespeed" style="position: relative;"><div class="noUi-handle noUi-lowerHandle" style="position: absolute; left: 121.667px; z-index: 1;"><div></div></div></div>
+						<div class="scrollspeed" style="position: relative;"><div class="noUi-midBar" style="position: absolute; left: 0px; right: 243.333px;"></div><div class="noUi-handle noUi-upperHandle" style="position: absolute; left: 121.667px; z-index: 1;"><div></div></div></div>
+						<input class="visual-controls-button" type="button">
+						<input class="sound-controls-button" type="button">
+						<input class="options-button" type="button">
+					</div>
+					<div id="sound-controls-menu-div" class="game-menu" style="top: 123px; left: 30px; display: none;">
+						<div class="musicvolume" style="position: relative;"><div class="noUi-midBar" style="position: absolute; left: 0px; right: 0px;"></div><div class="noUi-handle noUi-upperHandle" style="position: absolute; left: 200px; z-index: 1;"><div></div></div></div>
+						<div class="soundvolume" style="position: relative;"><div class="noUi-midBar" style="position: absolute; left: 0px; right: 0px;"></div><div class="noUi-handle noUi-upperHandle" style="position: absolute; left: 200px; z-index: 1;"><div></div></div></div>
+						<select class="music-tracks-list" size="11">
+							<option>Track 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2:52 &nbsp; Act On Instinct</option>
+							<option>Track 2 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2:42 &nbsp; To Be Feared</option>
+							<option>Track 3 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2:50 &nbsp; Mechanical Man</option>
+							<option>Track 4 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2:20 &nbsp; Just Do It Up</option>
+							<option>Track 5 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3:10 &nbsp; C&amp;C Thang</option>
+						</select>
+
+						<input class="stop-button" type="button">
+						<input class="play-button" type="button">
+						<input class="shuffle-button" value="Off" type="button">
+						<input class="repeat-button" value="Off" type="button">
+						<input class="options-button" type="button">
+					</div>
+					<div id="join-network-game-menu-div" class="game-menu" style="top: 19px; left: 35px; display: none;">
+						<input class="player-name" maxlength="25" type="text">
+						<div class="multiplayer-team">
+							<label><input name="multiplayer-team" value="gdi" checked="" type="radio">GDI</label>
+							<label><input name="multiplayer-team" value="nod" type="radio">NOD</label>
+						</div>
+						<div class="multiplayer-team-color">
+							<span style="background-color:yellow;"><input name="multiplayer-team-color" value="yellow" checked="" type="radio"></span>
+							<span style="background-color:red;"><input name="multiplayer-team-color" value="red" type="radio"></span>
+							<span style="background-color:teal;"><input name="multiplayer-team-color" value="teal" type="radio"></span>
+							<span style="background-color:orange;"><input name="multiplayer-team-color" value="orange" type="radio"></span>
+							<span style="background-color:lightgreen;"><input name="multiplayer-team-color" value="green" type="radio"></span>
+							<span style="background-color:gray;"><input name="multiplayer-team-color" value="gray" type="radio"></span>
+							<span style="background-color:brown;"><input name="multiplayer-team-color" value="brown" type="radio"></span>
+						</div>
+						<select size="5" class="games-list"></select>
+						<select size="5" class="player-list"></select>
+						<div class="messages"></div>
+						<input class="join-multiplayer-button" type="button">
+						<input class="cancel-multiplayer-button" type="button">
+						<input class="new-multiplayer-button" type="button">
+						<input class="send-message-button" type="button">
+						<input class="input-message" type="text">
+					</div>
+					<div id="start-network-game-menu-div" class="game-menu" style="top: 69px; left: 35px; display: none;">
+						<select class="player-list" size="6"><option>adi</option></select>
+						<select class="scenarios" size="5">
+							<option value="0" selected="">GREEN ACRES</option>
+							<option value="1">SAND TRAP</option>
+							<option value="2">LOST ARENA</option>
+							<option value="3">RIVER RAID</option>
+							<option value="4">EYE OF THE STORM</option>
+						</select>
+						<div class="gamespeed" style="position: relative;"><div class="noUi-handle noUi-lowerHandle" style="position: absolute; left: 121.667px; z-index: 1;"><div></div></div></div>
+						<input class="reject-player-button" type="button">
+						<input class="start-multiplayer-button" type="button">
+						<input class="cancel-multiplayer-button" type="button">
+						<input class="send-message-button" type="button">
+						<div class="messages"></div>
+						<input class="input-message" type="text">
+						<input class="starting-credits" value="5000" maxlength="6" type="text">
+					</div>
+					<div id="joined-network-game-menu-div" class="game-menu" style="top: 91px; left: 35px; display: none;">
+						<select class="player-list" size="5"><option>adi</option></select>
+						<input class="cancel-multiplayer-button" type="button">
+						<input class="send-message-button" type="button">
+						<div class="messages"></div>
+						<input class="input-message" type="text">
+					</div>
+				</div>
+				<div id="message-box-container" class="gamelayer" style="background-color: green; width: 643px; height: 537px; display: none;">
+					<div id="message-box-menu-div" class="game-menu" style="top: 193px; left: 23px; display: none;">
+						<div class="message-box-title">??</div>
+						<div class="message-box-content">???</div>
+						<input class="message-box-ok" type="button">
+					</div>
+				</div>
+
+				<div id="loadingscreen" class="gamelayer" style="width: 643px; height: 537px; display: none;">
+					<div id="loadingbar">
+						<div id="loadingmessage">Loading 172 of 172...</div>
+						<progress id="progressbar" max="100" value="100"></progress>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="gamecontrols">
+			<input value="Play Full Screen" id="fullscreenbutton" class="btn btn-default btn-sm" type="button">
+		</div>
+	</div>
+</div>
+
+
+    </div>
+    <div class="col-sm-6">
+        <div class="well bs-component">
+            <form class="form-horizontal" id="control-form">
+                <fieldset>
+                    <legend>Input analysis</legend>
+                    <p>Type the id of an existing or a new user and press the 'record user' button to begin.</p>
+                    <div class="form-group" id="form-group-inputUser">
+                        <label for="inputUser" class="col-lg-4 control-label">User:</label>
+                        <div class="col-lg-4">
+                            <input class="form-control" id="inputUser" placeholder="username" type="text">
+                        </div>
+                        <div class="col-lg-4">
+                            <button type="submit" id="record-user-btn" class="btn btn-primary">Record user</button>
+                            <button type="submit" id="stop-record-btn" class="btn btn-primary" style="display: none">Stop recording</button>
+                        </div>
+                    </div>
+                    <div class="form-group" id="form-group-minvalue">
+                        <label for="inputMin" class="col-lg-4 control-label">Minimum value:</label>
+                        <div class="col-lg-8">
+                            <input class="form-control" id="inputMin" value="0.0" placeholder="0.0" type="text">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+            <div class="progress" style="display:none" id="progress-bar-container">
+                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;" id="progress-bar">
+                    <span class="show">Recording user <span id="user-recording-alert-iduser"></span> input</span>
+                </div>
+            </div>
+            <p>This <strong>Confusion Matrix</strong> shows the similarity of every user with respect to every other user as computed by the neural network:</p>
+            <img class="img-responsive" src="/neuralauth/compare?rangemin=0.0" id="graph-confusion-matrix">
+            <br/>
+            <p>Press this button to reset the data collected by the network</p>
+            <button type="submit" id="btn-reset-state" class="btn btn-primary">Reset state</button>
+            <button type="submit" id="btn-reload-graph" class="btn btn-primary"><span class="glyphicon glyphicon-refresh"></span>&nbsp;&nbsp;refresh graph</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'neuralauth/neuralauth.js' %}"></script>
+<script type="text/javascript">
+
+// reload the confusion matrix on every sent batch
+neuralauth.setOnRecognizeCb(function() {
+    if(validate()) {
+        d = new Date();
+        min = parseFloat($("#inputMin").val());
+        $("#graph-confusion-matrix").attr("src", "/neuralauth/compare?rangemin="+min+"&touch="+d.getTime());
+    }
+});
+
+// update the progress bar when input is recorded
+neuralauth.setInputRecordCb(function(size) {
+    var pct = (size / neuralauth.EVENT_BUFFER_SIZE) * 100;
+    setTimeout(function() {
+        $('#progress-bar').css('width', pct + '%');
+    });
+});
+
+/* Validate the form */
+function validate() {
+
+    var valid = true;
+
+    if($('#inputUser').val() == "") {
+        $('#form-group-inputUser').addClass('has-error');        
+        valid = false;
+    } else {
+        $('#form-group-inputUser').removeClass('has-error');
+    }
+
+    var inputMin = $('#inputMin').val();
+    if(parseFloat(inputMin) == NaN || parseFloat(inputMin) < 0.0  || parseFloat(inputMin) > 10.0) {
+        $('#form-group-minvalue').addClass('has-error');
+        valid = false;
+    } else {
+        $('#form-group-minvalue').removeClass('has-error');
+    }
+
+    return valid;
+}
+
+// prevent form from submitting
+$("#control-form").submit(function(e) {
+    e.preventDefault();
+});
+
+$('#record-user-btn').click(function() {
+    if(validate()) {
+        $('#progress-bar-container').show();
+        $('#record-user-btn').hide()
+        $('#stop-record-btn').show();
+
+        neuralauth.start($('#inputUser').val())
+    }
+});
+
+$('#stop-record-btn').click(function() {
+    $('#progress-bar-container').hide();
+    $('#stop-record-btn').hide();
+    $("#record-user-btn").show();
+    $("#user-recording-alert").hide();
+    $('#progress-bar').css('width', 0 + '%');
+    neuralauth.stop();
+});
+
+$('#btn-reset-state').click(function() {
+    if(validate()) {
+        neuralauth.reset();
+        d = new Date();
+        min = parseFloat($("#inputMin").val());
+        $("#graph-confusion-matrix").attr("src", "/neuralauth/compare?rangemin="+min+"&touch="+d.getTime());
+    }
+});
+
+$('#btn-reload-graph').click(function() {
+
+    var valid = true;
+    var inputMin = $('#inputMin').val();
+    if(parseFloat(inputMin) == NaN || parseFloat(inputMin) < 0.0  || parseFloat(inputMin) > 10.0) {
+        $('#form-group-minvalue').addClass('has-error');
+        valid = false;
+    } else {
+        $('#form-group-minvalue').removeClass('has-error');
+    }
+
+
+    if(valid) {
+        d = new Date();
+        min = parseFloat($("#inputMin").val());
+        $("#graph-confusion-matrix").attr("src", "/neuralauth/compare?rangemin="+min+"&touch="+d.getTime());   
+    }
+});
+
+</script>
+
+<script src="{% static 'deep/release/cnc-0.8.3.b.js'%}"></script>
+{% endblock %}

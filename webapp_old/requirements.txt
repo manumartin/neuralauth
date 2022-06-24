@@ -1,0 +1,8 @@
+Django == 1.10.5
+Pyro4 == 4.60
+djangorestframework == 3.6.3
+django-forms-bootstrap
+matplotlib == 2.0.0
+numpy == 1.12.1
+scikit-learn == 0.18.1
+scipy
