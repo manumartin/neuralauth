@@ -46,3 +46,15 @@ a utility to record mouse input from a local user etc.
 
 **webapp/** : Contains a django web application with a backend and a frontend
 so that users can interact with the model.
+
+### Launching
+
+- Install python 3.8
+- Configure the webapp/webapp/settings.py file, the ALLOWED_HOSTS variable etc..
+- Install python dependencies and run the launch script: 
+
+```
+pip install -r requirements.txt
+./launch.sh
+```
+
