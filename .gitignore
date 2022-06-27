@@ -2,8 +2,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
-.pkl
+*.pkl
 .idea
-.pyc
+*.pyc
 nohup.out
 
